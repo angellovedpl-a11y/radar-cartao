@@ -1,75 +1,94 @@
 import streamlit as st
 
-# 1. Configuração e Estilo (Visual Sniper)
-st.set_page_config(page_title="Rei dos Cartões", layout="wide")
+# 1. Setup de Interface "Black-Gold"
+st.set_page_config(page_title="Rei dos Cartões | VIP", layout="wide")
 
 st.markdown("""
     <style>
-    body { background-color: #050505; color: #00FF41; font-family: 'JetBrains Mono', monospace; }
+    body { background-color: #050505; color: white; font-family: 'Inter', sans-serif; }
     .stApp { background-color: #050505; }
-    .card-principal { background: #111; border: 1px solid #333; padding: 20px; border-radius: 15px; margin-bottom: 20px; border-left: 5px solid #FFD700; }
-    .card-jogador { background: #0a0a0a; border: 1px solid #222; padding: 15px; border-radius: 10px; border-top: 3px solid #FFD700; }
-    .odd-box { background: #1a1a1a; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #444; }
-    .label { color: #888; font-size: 11px; text-transform: uppercase; }
+    
+    /* Grid de Jogos */
+    .game-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
+    
+    /* Card de Jogo Quente */
+    .card-hot {
+        background: linear-gradient(145deg, #1a1a1a, #000);
+        border: 1px solid #333;
+        border-top: 4px solid #FFD700;
+        padding: 15px;
+        border-radius: 12px;
+        position: relative;
+    }
+    
+    .badge-live { background: #FF0000; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+    .badge-value { background: #00FF41; color: black; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+    
+    .odd-mini { background: #222; border: 1px solid #444; padding: 5px; border-radius: 6px; text-align: center; width: 48%; }
+    .player-name { color: #FFD700; font-weight: bold; font-size: 16px; margin: 5px 0; }
+    .label { color: #888; font-size: 10px; text-transform: uppercase; }
     </style>
     """, unsafe_allow_html=True)
 
-# 2. Sistema de Abas (Operação vs Cadastro)
-aba1, aba2 = st.tabs(["🎯 RADAR DE ODDS", "⚙️ ADMINISTRADOR"])
+st.title("👑 REI DOS CARTÕES | SCANNER PRO")
+st.markdown("#### 📡 Radar de Valor - Sinais em Tempo Real")
 
-with aba2:
-    st.subheader("Cadastrar Oportunidade do Dia")
-    with st.form("cadastro_jogo"):
-        jogo_nome = st.text_input("Partida (Ex: Vasco x Fla)")
-        mercado_jogo = st.text_input("Mercado Jogo (Ex: Over 5.5)")
-        odd_site_jogo = st.number_input("Odd Site Jogo", value=2.50)
-        odd_rei_jogo = st.number_input("Odd Rei Jogo", value=2.00)
-        
-        st.divider()
-        jogador_nome = st.text_input("Jogador Alvo")
-        odd_site_player = st.number_input("Odd Site Jogador", value=4.50)
-        odd_rei_player = st.number_input("Odd Rei Jogador", value=2.50)
-        
-        btn_salvar = st.form_submit_button("PUBLICAR NO DASHBOARD")
-        if btn_salvar:
-            st.session_state['dados_viva'] = {
-                "jogo": jogo_nome, "mercado": mercado_jogo, "osj": odd_site_jogo, "orj": odd_rei_jogo,
-                "player": jogador_nome, "osp": odd_site_player, "orp": odd_rei_player
-            }
+# --- DATABASE SIMULADA DE VOLUME (Para não ficar vazio) ---
+jogos = [
+    {"time": "VASCO x FLAMENGO", "juiz": "R. Claus", "v": "+22%", "o_site": 2.50, "o_rei": 2.05, "p": "MEDEL", "p_odd": 4.33},
+    {"time": "PALMEIRAS x SPFC", "juiz": "Daronco", "v": "+18%", "o_site": 1.90, "o_rei": 1.65, "p": "LUCIANO", "p_odd": 3.40},
+    {"time": "CRUZEIRO x GALO", "juiz": "W. Sampaio", "v": "+15%", "o_site": 2.15, "o_rei": 1.85, "p": "HULK", "p_odd": 3.75},
+    {"time": "GRÊMIO x INTER", "juiz": "F. Rodrigues", "v": "+30%", "o_site": 2.80, "o_rei": 2.10, "p": "KANNEMANN", "p_odd": 2.90},
+]
 
-# 3. Dashboard de Operação
-with aba1:
-    dados = st.session_state.get('dados_viva', {
-        "jogo": "VASCO vs FLAMENGO", "mercado": "Over 5.5 Cartões", "osj": 2.62, "orj": 2.10,
-        "player": "MEDEL (Vasco)", "osp": 4.33, "orp": 2.20
-    })
+# --- GRID DE EXIBIÇÃO ---
+col1, col2 = st.columns(2)
 
-    st.markdown(f"""
-        <div class="card-principal">
-            <div style='display: flex; justify-content: space-between;'>
-                <h2 style='margin:0; color:white;'>{dados['jogo']}</h2>
-                <span style='color:#00FF41; font-weight:bold;'>VALOR DETECTADO</span>
-            </div>
-            <p style='color:#888;'>Mercado: {dados['mercado']}</p>
-            <div style='display: flex; gap: 20px; margin-top:15px;'>
-                <div class="odd-box"> <span class="label">SITE PAGA</span><br><b style='font-size: 22px; color: #FF4B4B;'>{dados['osj']:.2f}</b> </div>
-                <div class="odd-box"> <span class="label">REI DIZ</span><br><b style='font-size: 22px; color: #00FF41;'>{dados['orj']:.2f}</b> </div>
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
-
-    col1, col2 = st.columns(2)
-    with col1:
+for i, jogo in enumerate(jogos):
+    with col1 if i % 2 == 0 else col2:
         st.markdown(f"""
-            <div class="card-jogador">
-                <h4 style='margin:0; color:#FFD700;'>{dados['player']}</h4>
-                <div style='display: flex; justify-content: space-between; margin-top:15px;'>
-                    <div class="odd-box" style='width:45%;'> <small class="label">SITE PAGA</small><br><b>{dados['osp']:.2f}</b> </div>
-                    <div class="odd-box" style='width:45%;'> <small class="label">REI DIZ</small><br><b style='color:#00FF41;'>{dados['orp']:.2f}</b> </div>
+            <div class="card-hot">
+                <div style='display: flex; justify-content: space-between;'>
+                    <span class="badge-live">● LIVE</span>
+                    <span class="badge-value">{jogo['v']} VALUE</span>
+                </div>
+                <h3 style='margin:10px 0 0 0; color:white;'>{jogo['time']}</h3>
+                <p style='color:#666; font-size:12px;'>Árbitro: {jogo['juiz']}</p>
+                
+                <div style='display: flex; justify-content: space-between; margin-top:10px;'>
+                    <div class="odd-mini">
+                        <span class="label">Over 5.5 (Site)</span><br>
+                        <b style='color:#FF4B4B;'>{jogo['o_site']:.2f}</b>
+                    </div>
+                    <div class="odd-mini">
+                        <span class="label">Over 5.5 (Rei)</span><br>
+                        <b style='color:#00FF41;'>{jogo['o_rei']:.2f}</b>
+                    </div>
+                </div>
+                
+                <hr style='border: 0.1px solid #222; margin: 15px 0;'>
+                
+                <div style='display: flex; justify-content: space-between; align-items: center;'>
+                    <div>
+                        <span class="label">Destaque Jogador</span><br>
+                        <span class="player-name">{jogo['p']}</span>
+                    </div>
+                    <div class="odd-mini" style="width: 30%;">
+                        <span class="label">Odd Cartão</span><br>
+                        <b style='color:#FFD700;'>{jogo['p_odd']:.2f}</b>
+                    </div>
                 </div>
             </div>
         """, unsafe_allow_html=True)
 
-st.sidebar.title("REI DOS CARTÕES")
-if st.sidebar.button("📲 NOTIFICAR TELEGRAM"):
-    st.sidebar.success("Sinal enviado!")
+st.sidebar.title("MENU VIP")
+st.sidebar.checkbox("Filtrar apenas +20% Value", value=True)
+st.sidebar.checkbox("Alertas Sonoros", value=True)
+if st.sidebar.button("📲 DISPARAR TODOS OS SINAIS"):
+    st.sidebar.success("Canal do Telegram Atualizado!")
+
+st.divider()
+st.markdown("#### 📑 Histórico de Greens Recentes")
+# Tabela de prova social rápida
+hist_data = {"Partida": ["Corinthians x Santos", "Bahia x Vitória"], "Mercado": ["Fagner (Cartão)", "Over 6.5"], "Odd": [3.20, 2.45], "Status": ["✅ GREEN", "✅ GREEN"]}
+st.table(hist_data)
