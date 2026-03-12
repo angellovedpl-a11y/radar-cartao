@@ -1,80 +1,119 @@
 import streamlit as st
 import pandas as pd
 
-st.set_page_config(page_title="Rei dos Cartões - Scanner", layout="wide")
+# Configuração de App de Elite
+st.set_page_config(page_title="Rei dos Cartões", layout="wide", initial_sidebar_state="collapsed")
 
-# Estilo focado em Leitura de Odds
+# Estilização CSS Superior (Visual Premium v0)
 st.markdown("""
     <style>
-    body { background-color: #000; color: #fff; }
-    .market-box {
-        background: #111;
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+    html, body, [class*="st-"] { font-family: 'Inter', sans-serif; background-color: #050505; color: white; }
+    
+    .main-title { font-size: 32px; font-weight: bold; color: #FFD700; margin-bottom: 20px; }
+    
+    /* Card Principal de Oportunidade */
+    .opportunity-card {
+        background: linear-gradient(180deg, #111 0%, #000 100%);
         border: 1px solid #333;
+        padding: 25px;
+        border-radius: 20px;
+        margin-bottom: 25px;
+        border-top: 4px solid #FFD700;
+    }
+    
+    .player-card {
+        background: #111;
+        border: 1px solid #222;
         padding: 15px;
-        border-radius: 12px;
-        margin-bottom: 10px;
+        border-radius: 15px;
+        transition: 0.3s;
     }
-    .value-tag {
-        color: #00FF41;
-        font-weight: bold;
-        background: rgba(0, 255, 65, 0.1);
-        padding: 2px 8px;
-        border-radius: 4px;
+    .player-card:hover { border-color: #FFD700; }
+    
+    .odd-tag {
+        background: #222;
+        padding: 8px 15px;
+        border-radius: 8px;
+        text-align: center;
+        border: 1px solid #444;
     }
-    .player-name { color: #FFD700; font-weight: bold; font-size: 18px; }
+    
+    .value-green { color: #00FF41; font-weight: bold; font-size: 18px; }
+    .label-gray { color: #888; font-size: 11px; text-transform: uppercase; }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("👑 REI DOS CARTÕES")
-st.markdown("#### Scanner Especialista: Over/Under & Player Prop")
+# Header
+st.markdown("<div class='main-title'>👑 REI DOS CARTÕES</div>", unsafe_allow_html=True)
 
-# --- DATABASE DE JOGADORES (A INTELIGÊNCIA) ---
-# Aqui você pode alimentar com os "brabos" do campeonato
-db_jogadores = {
-    "Medel": {"time": "Vasco", "media": 0.45, "odd_real": 2.22},
-    "Felipe Melo": {"time": "Fluminense", "media": 0.52, "odd_real": 1.92},
-    "Kannemann": {"time": "Grêmio", "media": 0.48, "odd_real": 2.08}
-}
-
-# --- SEÇÃO 1: MERCADO DE OVER GERAL ---
-st.subheader("🏟️ Over/Under do Jogo")
-with st.container():
-    st.markdown("""
-        <div class="market-box">
-            <div style='display: flex; justify-content: space-between;'>
-                <span><b>Vasco x Flamengo</b> (Over 5.5 Cartões)</span>
-                <span class="value-tag">+14% VALUE</span>
+# --- DESTAQUE DO DIA (OVER/UNDER GERAL) ---
+st.markdown("### 🏟️ JOGO EM DESTAQUE (OVER 5.5)")
+st.markdown("""
+    <div class="opportunity-card">
+        <div style='display: flex; justify-content: space-between; align-items: center;'>
+            <div>
+                <h2 style='margin:0;'>VASCO vs FLAMENGO</h2>
+                <p style='color:#888;'>Árbitro: <b>Raphael Claus</b> | Média: 6.2 Cartões</p>
             </div>
-            <div style='display: flex; gap: 30px; margin-top:10px;'>
-                <div><small>CASA (Bet365)</small><br><b style='font-size:20px;'>2.45</b></div>
-                <div><small>ODD JUSTA</small><br><b style='font-size:20px; color:#00FF41;'>2.15</b></div>
+            <div style='text-align: right;'>
+                <span class="value-green">+18.5% VALUE</span><br>
+                <small style='color:#FFD700;'>🔥 ALTA PROBABILIDADE</small>
             </div>
         </div>
-    """, unsafe_allow_html=True)
+        <div style='display: flex; gap: 20px; margin-top: 20px; justify-content: start;'>
+            <div class="odd-tag">
+                <span class="label-gray">Odd Bet365</span><br>
+                <b style='font-size: 22px; color: #FF4B4B;'>2.62</b>
+            </div>
+            <div class="odd-tag">
+                <span class="label-gray">Odd Real (Rei)</span><br>
+                <b style='font-size: 22px; color: #00FF41;'>2.10</b>
+            </div>
+        </div>
+    </div>
+""", unsafe_allow_html=True)
 
-# --- SEÇÃO 2: MERCADO DE JOGADORES (PLAYER CARDS) ---
-st.subheader("👤 Oportunidades em Jogadores")
-col1, col2 = st.columns(2)
+# --- MERCADO DE JOGADORES (O QUE ATRAI O APOSTADOR) ---
+st.markdown("### 👤 SELEÇÃO DE JOGADORES (PROPS)")
+col1, col2, col3 = st.columns(3)
 
-# O robô varre a lista e encontra onde a odd da casa (ex: 4.00) está maior que a nossa
-for nome, dados in list(db_jogadores.items())[:2]:
-    with col1 if nome == "Medel" else col2:
-        odd_casa_jogador = 4.33 if nome == "Medel" else 3.10 # Simulação de odd da casa
-        valor_jogador = (odd_casa_jogador / dados['odd_real']) - 1
-        
+# Lista de jogadores "Brabos"
+jogadores = [
+    {"nome": "MEDEL", "time": "Vasco", "odd": "4.33", "real": "3.10", "valor": "+28%"},
+    {"nome": "F. MELO", "time": "Flu", "odd": "2.85", "real": "2.10", "valor": "+26%"},
+    {"nome": "KANNEMANN", "time": "Grêmio", "odd": "3.20", "real": "2.50", "valor": "+21%"}
+]
+
+for i, jogador in enumerate(jogadores):
+    with [col1, col2, col3][i]:
         st.markdown(f"""
-            <div class="market-box" style="border-top: 3px solid #FFD700;">
-                <span class="player-name">{nome}</span> <small>({dados['time']})</small>
-                <div style='display: flex; justify-content: space-between; margin-top:10px;'>
-                    <div><small>ODD CASA</small><br><b>{odd_casa_jogador:.2f}</b></div>
-                    <div><small>ODD REI</small><br><b style='color:#00FF41;'>{dados['odd_real']:.2f}</b></div>
-                    <div style='text-align:right;'><span class="value-tag">{valor_jogador*100:.1f}%</span></div>
+            <div class="player-card">
+                <p style='margin:0; font-weight:bold;'>{jogador['nome']}</p>
+                <p class="label-gray">{jogador['time']}</p>
+                <div style='display: flex; justify-content: space-between; margin-top: 15px;'>
+                    <div class="odd-tag" style='padding: 5px 10px;'>
+                        <small style='font-size:9px;'>ODD CASA</small><br><b>{jogador['odd']}</b>
+                    </div>
+                    <div style='text-align:right;'>
+                        <span class="value-green">{jogador['valor']}</span><br>
+                        <small class="label-gray">VALUE</small>
+                    </div>
                 </div>
             </div>
         """, unsafe_allow_html=True)
 
-# --- CONFIGURAÇÃO DE ALERTA ---
-st.sidebar.header("🎯 Filtro de Sinais")
-min_value = st.sidebar.slider("Valor Mínimo (%)", 5, 50, 10)
-if st.sidebar.button("🚀 Enviar Sugestão de Stake"):
-    st.sidebar.info("Calculando Gestão de Banca...")
+st.divider()
+
+# --- AÇÃO E NOTIFICAÇÃO ---
+st.markdown("#### ⚙️ CONFIGURAR ALERTAS DE ODD")
+c1, c2 = st.columns(2)
+with c1:
+    st.slider("Notificar se o valor for maior que:", 5, 50, 15, format="%d%%")
+with c2:
+    if st.button("🚀 ATIVAR RADAR NO TELEGRAM"):
+        st.success("Radar Ativo! Você receberá as brechas de odds no celular.")
+
+st.sidebar.image("https://img.icons8.com/ios-filled/50/FFFFFF/poker-cards.png", width=50)
+st.sidebar.title("MENU REI")
+st.sidebar.info("O Rei dos Cartões analisa 12 ligas em tempo real buscando erros das casas de apostas.")
