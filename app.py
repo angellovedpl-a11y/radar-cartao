@@ -1,119 +1,86 @@
 import streamlit as st
 import pandas as pd
 
-# Configuração de App de Elite
-st.set_page_config(page_title="Rei dos Cartões", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="Rei dos Cartões", layout="wide")
 
-# Estilização CSS Superior (Visual Premium v0)
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-    html, body, [class*="st-"] { font-family: 'Inter', sans-serif; background-color: #050505; color: white; }
-    
-    .main-title { font-size: 32px; font-weight: bold; color: #FFD700; margin-bottom: 20px; }
-    
-    /* Card Principal de Oportunidade */
-    .opportunity-card {
-        background: linear-gradient(180deg, #111 0%, #000 100%);
-        border: 1px solid #333;
-        padding: 25px;
-        border-radius: 20px;
-        margin-bottom: 25px;
-        border-top: 4px solid #FFD700;
-    }
-    
-    .player-card {
+    body { background-color: #050505; color: white; font-family: 'Inter', sans-serif; }
+    .cartao-box {
         background: #111;
-        border: 1px solid #222;
-        padding: 15px;
+        border: 1px solid #333;
+        padding: 20px;
         border-radius: 15px;
-        transition: 0.3s;
+        margin-bottom: 20px;
     }
-    .player-card:hover { border-color: #FFD700; }
-    
-    .odd-tag {
-        background: #222;
-        padding: 8px 15px;
-        border-radius: 8px;
-        text-align: center;
-        border: 1px solid #444;
-    }
-    
-    .value-green { color: #00FF41; font-weight: bold; font-size: 18px; }
-    .label-gray { color: #888; font-size: 11px; text-transform: uppercase; }
+    .titulo-mercado { color: #FFD700; font-weight: bold; font-size: 20px; }
+    .valor-lucro { color: #00FF41; font-weight: bold; font-size: 24px; }
+    .box-preco { background: #222; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #444; }
     </style>
     """, unsafe_allow_html=True)
 
-# Header
-st.markdown("<div class='main-title'>👑 REI DOS CARTÕES</div>", unsafe_allow_html=True)
+st.title("👑 REI DOS CARTÕES")
+st.write("Monitorando falhas nos mercados de cartões em tempo real.")
 
-# --- DESTAQUE DO DIA (OVER/UNDER GERAL) ---
-st.markdown("### 🏟️ JOGO EM DESTAQUE (OVER 5.5)")
+# --- SEÇÃO 1: CARTÕES NO JOGO ---
+st.markdown("### 🏟️ Mercado: Total de Cartões (Over)")
 st.markdown("""
-    <div class="opportunity-card">
-        <div style='display: flex; justify-content: space-between; align-items: center;'>
-            <div>
-                <h2 style='margin:0;'>VASCO vs FLAMENGO</h2>
-                <p style='color:#888;'>Árbitro: <b>Raphael Claus</b> | Média: 6.2 Cartões</p>
-            </div>
-            <div style='text-align: right;'>
-                <span class="value-green">+18.5% VALUE</span><br>
-                <small style='color:#FFD700;'>🔥 ALTA PROBABILIDADE</small>
-            </div>
+    <div class="cartao-box" style="border-left: 5px solid #FFD700;">
+        <div style='display: flex; justify-content: space-between;'>
+            <span class="titulo-mercado">VASCO vs FLAMENGO</span>
+            <span class="valor-lucro">+20% DE MARGEM</span>
         </div>
-        <div style='display: flex; gap: 20px; margin-top: 20px; justify-content: start;'>
-            <div class="odd-tag">
-                <span class="label-gray">Odd Bet365</span><br>
-                <b style='font-size: 22px; color: #FF4B4B;'>2.62</b>
+        <p style='color:#888;'>Previsão: Mais de 5.5 cartões na partida</p>
+        <div style='display: flex; gap: 20px; margin-top: 15px;'>
+            <div class="box-preco">
+                <small style='color:#888;'>SITE DE APOSTA PAGA</small><br>
+                <b style='font-size: 22px; color: #FF4B4B;'>2.50</b>
             </div>
-            <div class="odd-tag">
-                <span class="label-gray">Odd Real (Rei)</span><br>
-                <b style='font-size: 22px; color: #00FF41;'>2.10</b>
+            <div class="box-preco">
+                <small style='color:#888;'>O REI DIZ QUE VALE</small><br>
+                <b style='font-size: 22px; color: #00FF41;'>2.00</b>
             </div>
         </div>
     </div>
 """, unsafe_allow_html=True)
 
-# --- MERCADO DE JOGADORES (O QUE ATRAI O APOSTADOR) ---
-st.markdown("### 👤 SELEÇÃO DE JOGADORES (PROPS)")
-col1, col2, col3 = st.columns(3)
+# --- SEÇÃO 2: CARTÕES PARA JOGADORES ---
+st.markdown("### 👤 Mercado: Cartão para Jogador Específico")
+col1, col2 = st.columns(2)
 
-# Lista de jogadores "Brabos"
-jogadores = [
-    {"nome": "MEDEL", "time": "Vasco", "odd": "4.33", "real": "3.10", "valor": "+28%"},
-    {"nome": "F. MELO", "time": "Flu", "odd": "2.85", "real": "2.10", "valor": "+26%"},
-    {"nome": "KANNEMANN", "time": "Grêmio", "odd": "3.20", "real": "2.50", "valor": "+21%"}
-]
-
-for i, jogador in enumerate(jogadores):
-    with [col1, col2, col3][i]:
-        st.markdown(f"""
-            <div class="player-card">
-                <p style='margin:0; font-weight:bold;'>{jogador['nome']}</p>
-                <p class="label-gray">{jogador['time']}</p>
-                <div style='display: flex; justify-content: space-between; margin-top: 15px;'>
-                    <div class="odd-tag" style='padding: 5px 10px;'>
-                        <small style='font-size:9px;'>ODD CASA</small><br><b>{jogador['odd']}</b>
-                    </div>
-                    <div style='text-align:right;'>
-                        <span class="value-green">{jogador['valor']}</span><br>
-                        <small class="label-gray">VALUE</small>
-                    </div>
+with col1:
+    st.markdown("""
+        <div class="cartao-box" style="border-top: 4px solid #FFD700;">
+            <p class="titulo-mercado">MEDEL (Vasco)</p>
+            <p style='color:#888; font-size:14px;'>Motivo: 45% de chance de levar amarelo hoje</p>
+            <div style='display: flex; justify-content: space-between; margin-top: 15px;'>
+                <div class="box-preco" style='width:45%;'>
+                    <small style='font-size:10px;'>O SITE PAGA</small><br><b>4.33</b>
+                </div>
+                <div class="box-preco" style='width:45%;'>
+                    <small style='font-size:10px;'>O REI DIZ</small><br><b style='color:#00FF41;'>2.20</b>
                 </div>
             </div>
-        """, unsafe_allow_html=True)
+        </div>
+    """, unsafe_allow_html=True)
 
-st.divider()
+with col2:
+    st.markdown("""
+        <div class="cartao-box" style="border-top: 4px solid #FFD700;">
+            <p class="titulo-mercado">F. MELO (Fluminense)</p>
+            <p style='color:#888; font-size:14px;'>Motivo: Histórico pesado em clássicos</p>
+            <div style='display: flex; justify-content: space-between; margin-top: 15px;'>
+                <div class="box-preco" style='width:45%;'>
+                    <small style='font-size:10px;'>O SITE PAGA</small><br><b>3.10</b>
+                </div>
+                <div class="box-preco" style='width:45%;'>
+                    <small style='font-size:10px;'>O REI DIZ</small><br><b style='color:#00FF41;'>2.10</b>
+                </div>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
 
-# --- AÇÃO E NOTIFICAÇÃO ---
-st.markdown("#### ⚙️ CONFIGURAR ALERTAS DE ODD")
-c1, c2 = st.columns(2)
-with c1:
-    st.slider("Notificar se o valor for maior que:", 5, 50, 15, format="%d%%")
-with c2:
-    if st.button("🚀 ATIVAR RADAR NO TELEGRAM"):
-        st.success("Radar Ativo! Você receberá as brechas de odds no celular.")
-
-st.sidebar.image("https://img.icons8.com/ios-filled/50/FFFFFF/poker-cards.png", width=50)
-st.sidebar.title("MENU REI")
-st.sidebar.info("O Rei dos Cartões analisa 12 ligas em tempo real buscando erros das casas de apostas.")
+st.sidebar.title("Ajustes do Rei")
+st.sidebar.write("Aqui você controla a inteligência do robô.")
+if st.sidebar.button("📲 Testar Alerta Telegram"):
+    st.sidebar.success("Sinal de teste enviado!")
