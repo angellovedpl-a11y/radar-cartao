@@ -1,5 +1,5 @@
 streamlit
 pandas
-numpy
-beautifulsoup4
 plotly
+requests
+beautifulsoup4
