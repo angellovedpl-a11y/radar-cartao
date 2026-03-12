@@ -1,31 +1,59 @@
 import streamlit as st
+import pandas as pd
+import numpy as np
 
-st.set_page_config(page_title="The Card King", layout="wide")
+# Configuração estilo Bloomberg/Dark
+st.set_page_config(page_title="THE CARD KING PRO", layout="wide")
+
+# CSS para forçar o Dark Mode e estilo profissional
+st.markdown("""
+    <style>
+    .main { background-color: #0E1117; color: #FFFFFF; }
+    .stButton>button { width: 100%; border-radius: 5px; height: 3em; background-color: #FF4B4B; color: white; }
+    .stMetric { background-color: #161B22; padding: 15px; border-radius: 10px; border: 1px solid #30363D; }
+    </style>
+    """, unsafe_allow_html=True)
 
 st.title("👑 THE CARD KING PRO")
-st.subheader("Radar de Arbitragem & Cartões")
+st.subheader("Análise Estatística de Arbitragem")
 
-st.markdown("### 🔍 Análise de Confronto")
+# Barra Lateral com Filtros
+st.sidebar.header("Configurações do Robô")
+site_fonte = st.sidebar.selectbox("Fonte de Dados", ["Transfermarkt", "FBRef", "BetMines (API)"])
+st.sidebar.write(f"🟢 Status: Conectado")
 
-col1, col2 = st.columns(2)
+# Dados para o Radar (Simulando o início do Scraping)
+data = {
+    'Árbitro': ['Raphael Claus', 'Wilton Sampaio', 'Anderson Daronco', 'Flavio Rodrigues', 'Bráulio Machado'],
+    'Jogos': [12, 15, 10, 14, 11],
+    'Média Amarelos': [5.2, 6.1, 4.8, 5.5, 6.3],
+    'Vermelhos': [3, 5, 1, 4, 6]
+}
+df_arbitros = pd.DataFrame(data)
+
+# Interface Principal
+col1, col2 = st.columns([1, 2])
 
 with col1:
-    mandante = st.text_input("Time da Casa", "Vasco")
-    visitante = st.text_input("Time Visitante", "Botafogo")
+    st.markdown("### 🔍 Radar de Escala")
+    arbitro_selecionado = st.selectbox("Selecione o Árbitro", df_arbitros['Árbitro'])
+    
+    stats = df_arbitros[df_arbitros['Árbitro'] == arbitro_selecionado].iloc[0]
+    
+    st.metric("Média de Amarelos", stats['Média Amarelos'])
+    st.metric("Total de Vermelhos", int(stats['Vermelhos']))
 
 with col2:
-    arbitro = st.text_input("Árbitro da Partida", "Raphael Claus")
-    media_cartoes = st.number_input("Média de Cartões do Juiz", value=5.8)
+    st.markdown(f"### 📊 Comparativo de Médias")
+    st.bar_chart(df_arbitros.set_index('Árbitro')['Média Amarelos'])
 
-if st.button("Gerar Relatório de Risco"):
-    st.write("---")
-    st.write(f"### 📋 Relatório: {mandante} x {visitante}")
-    
-    if media_cartoes > 5.5:
-        st.error(f"🚨 ALERTA: {arbitro} tem tendência alta de cartões ({media_cartoes}).")
-        st.success("✅ Sugestão: Over 4.5 Cartões na partida.")
-    else:
-        st.warning(f"⚠️ Atenção: {arbitro} tem média moderada ({media_cartoes}).")
-        st.info("ℹ️ Sugestão: Aguardar o live ou buscar mercado de faltas.")
+st.divider()
 
-st.sidebar.info("Sistema Online via Nuvem")
+# Lógica de Alerta
+st.markdown("### ⚡ Veredito do King")
+if stats['Média Amarelos'] >= 5.5:
+    st.error(f"🔥 JOGO QUENTE: {arbitro_selecionado} tem média de {stats['Média Amarelos']}. Tendência Over Cartões.")
+else:
+    st.info(f"⚖️ JOGO REGULAR: {arbitro_selecionado} tem média de {stats['Média Amarelos']}. Estudo para Live.")
+
+st.caption("Sistema Online - Engine v2.0")
