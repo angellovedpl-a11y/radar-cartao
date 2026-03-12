@@ -1,88 +1,93 @@
 import streamlit as st
 import pandas as pd
 
-# Configuração de Interface de Alta Conversão
+# Interface Profissional de Sinais
 st.set_page_config(page_title="Rei dos Cartões - Scanner", layout="wide")
 
 st.markdown("""
     <style>
     body { background-color: #000; color: #fff; }
-    .opportunity-card {
-        background: #111;
-        border-left: 5px solid #00FF41;
+    .card-oportunidade {
+        background: linear-gradient(145deg, #1a1a1a 0%, #0a0a0a 100%);
+        border: 1px solid #333;
         padding: 20px;
-        border-radius: 10px;
+        border-radius: 15px;
         margin-bottom: 20px;
     }
-    .odd-box {
-        background: #222;
-        padding: 10px;
-        border-radius: 5px;
-        text-align: center;
-        min-width: 80px;
+    .badge-valor {
+        background-color: #00FF41; color: black;
+        padding: 4px 12px; border-radius: 5px; font-weight: bold; font-size: 14px;
     }
-    .profit-text { color: #00FF41; font-weight: bold; font-size: 20px; }
-    .house-text { color: #888; font-size: 12px; }
+    .odd-box {
+        background: #222; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #444;
+    }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("🎯 SCANNER DE OPPORTUNIDADES")
-st.markdown("### Encontrando brechas nas Odds de Cartões")
+st.title("🎯 REI DOS CARTÕES - SCANNER EV+")
 
-# --- LÓGICA DE CÁLCULO DE VALOR ---
-with st.sidebar:
-    st.header("⚙️ Ajuste de Mercado")
-    odd_casa = st.number_input("Odd Atual (Bet365/Betano):", value=2.20, step=0.05)
-    prob_real = st.slider("Probabilidade do Rei (%):", 0, 100, 65)
-    
-    # Cálculo: Odd Justa = 100 / Probabilidade
-    odd_justa = 100 / prob_real if prob_real > 0 else 0
-    # Valor = (Odd Casa / Odd Justa) - 1
-    valor = (odd_casa / odd_justa) - 1 if odd_justa > 0 else 0
+# --- SEÇÃO 1: OPORTUNIDADE DO JOGO ---
+st.markdown("### 🏟️ Mercado: Over Geral")
+col1, col2 = st.columns([2, 1])
 
-# --- EXIBIÇÃO DA OPORTUNIDADE ---
-st.markdown(f"""
-    <div class="opportunity-card">
-        <div style='display: flex; justify-content: space-between; align-items: center;'>
-            <div>
-                <h2 style='margin:0;'>VASCO vs FLAMENGO</h2>
-                <p style='color:#888;'>Mercado: Over 5.5 Cartões</p>
-            </div>
-            <div style='text-align: right;'>
-                <span class="profit-text">{valor*100:.1f}% DE VALOR</span><br>
-                <small>VALOR ESPERADO POSITIVO (EV+)</small>
-            </div>
-        </div>
-        <hr style='border: 0.1px solid #333;'>
-        <div style='display: flex; gap: 20px; justify-content: center; margin-top:15px;'>
-            <div class="odd-box">
-                <span class="house-text">ODD CASA</span><br>
-                <span style='font-size: 24px; color: #FF4B4B;'>{odd_casa:.2f}</span>
-            </div>
-            <div style='font-size: 30px; align-self: center;'> VS </div>
-            <div class="odd-box">
-                <span class="house-text">ODD DO REI (JUSTA)</span><br>
-                <span style='font-size: 24px; color: #00FF41;'>{odd_justa:.2f}</span>
-            </div>
-        </div>
-    </div>
-""", unsafe_allow_html=True)
-
-# --- RECOMENDAÇÃO DE GESTÃO ---
-col1, col2 = st.columns(2)
 with col1:
-    st.info(f"**Análise do Rei:** A casa está subestimando este jogo em {valor*100:.0f}%. O histórico do árbitro e a temperatura live indicam que essa Odd deveria estar em {odd_justa:.2f}.")
-with col2:
-    st.warning(f"**Sugestão de Entrada:** {min(5.0, valor*20):.1f}% da sua banca (Gestão de Risco Moderada).")
+    st.markdown("""
+        <div class="card-oportunidade">
+            <div style='display: flex; justify-content: space-between;'>
+                <h4>VASCO vs FLAMENGO</h4>
+                <span class="badge-valor">+22% DE VALOR</span>
+            </div>
+            <p style='color:#888; font-size:14px;'>Juiz: Raphael Claus | Média: 6.2 | Clima: Clássico Quente</p>
+            <div style='display: flex; gap: 15px; margin-top:10px;'>
+                <div class="odd-box"> <small>ODD CASA</small><br><b style='color:#FF4B4B;'>2.10</b> </div>
+                <div class="odd-box"> <small>ODD REI</small><br><b style='color:#00FF41;'>1.72</b> </div>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
 
-st.divider()
+# --- SEÇÃO 2: OPORTUNIDADE DE JOGADOR (O QUE VOCÊ PEDIU) ---
+st.markdown("### 👤 Mercado: Cartão para Jogador")
+col3, col4 = st.columns(2)
 
-# --- TABELA DE MONITORAMENTO DE ODDS ---
-st.markdown("#### 📡 Monitor de Radar - Outros Jogos")
-monitor_dados = {
-    "Jogo": ["Palmeiras x SPFC", "Cruzeiro x Galo"],
-    "Odd Casa": [1.85, 2.10],
-    "Odd Rei": [1.90, 1.75],
-    "Status": ["Aguardar Subir", "ENTRAR (VALOR)"]
-}
-st.table(pd.DataFrame(monitor_dados))
+# Simulação de Oportunidade 1
+with col3:
+    st.markdown("""
+        <div class="card-oportunidade" style="border-left: 4px solid #FFD700;">
+            <div style='display: flex; justify-content: space-between;'>
+                <h5 style='margin:0;'>MEDEL (Vasco)</h5>
+                <span style='color:#FFD700; font-weight:bold;'>TOP PICK</span>
+            </div>
+            <p style='color:#888; font-size:12px;'>Motivo: Marcação individual em Pedro + Reclamação</p>
+            <div style='display: flex; justify-content: space-between; align-items: center; margin-top:10px;'>
+                <div class="odd-box"> <small>ODD CASA</small><br><b>3.40</b> </div>
+                <div style='text-align:right;'>
+                    <span style='color:#00FF41; font-size:18px; font-weight:bold;'>VALOR: High</span><br>
+                    <small>Prob. Real: 42%</small>
+                </div>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+
+# Simulação de Oportunidade 2
+with col4:
+    st.markdown("""
+        <div class="card-oportunidade" style="border-left: 4px solid #FFD700;">
+            <div style='display: flex; justify-content: space-between;'>
+                <h5 style='margin:0;'>F. MELO (Fluminense)</h5>
+                <span style='color:#FFD700; font-weight:bold;'>TOP PICK</span>
+            </div>
+            <p style='color:#888; font-size:12px;'>Motivo: Histórico em Derbys + Árbitro Rigoroso</p>
+            <div style='display: flex; justify-content: space-between; align-items: center; margin-top:10px;'>
+                <div class="odd-box"> <small>ODD CASA</small><br><b>2.85</b> </div>
+                <div style='text-align:right;'>
+                    <span style='color:#00FF41; font-size:18px; font-weight:bold;'>VALOR: Medium</span><br>
+                    <small>Prob. Real: 38%</small>
+                </div>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+
+st.sidebar.title("🛠️ Configurar Filtros")
+fator_jogador = st.sidebar.slider("Peso do Histórico do Jogador", 1.0, 5.0, 3.5)
+if st.sidebar.button("📲 Notificar Oportunidade via Telegram"):
+    st.sidebar.success("Alerta enviado!")
