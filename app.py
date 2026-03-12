@@ -1,59 +1,81 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
+import plotly.express as px
 
-# Configuração estilo Bloomberg/Dark
-st.set_page_config(page_title="THE CARD KING PRO", layout="wide")
+# Configuração da página
+st.set_page_config(page_title="THE CARD KING PRO", layout="wide", initial_sidebar_state="collapsed")
 
-# CSS para forçar o Dark Mode e estilo profissional
+# CSS Avançado para imitar o estilo v0.dev / Bloomberg
 st.markdown("""
     <style>
-    .main { background-color: #0E1117; color: #FFFFFF; }
-    .stButton>button { width: 100%; border-radius: 5px; height: 3em; background-color: #FF4B4B; color: white; }
-    .stMetric { background-color: #161B22; padding: 15px; border-radius: 10px; border: 1px solid #30363D; }
+    /* Fundo principal */
+    .stApp { background-color: #050505; color: #E0E0E0; }
+    
+    /* Estilo dos Cards */
+    .metric-card {
+        background-color: #111111;
+        border: 1px solid #333333;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        margin-bottom: 10px;
+    }
+    
+    /* Títulos e textos */
+    h1, h2, h3 { color: #FFFFFF !important; font-family: 'Inter', sans-serif; font-weight: 700; }
+    
+    /* Botão customizado */
+    .stButton>button {
+        background: linear-gradient(90deg, #FF4B4B 0%, #8B0000 100%);
+        color: white; border: none; border-radius: 8px; font-weight: bold; transition: 0.3s;
+    }
+    .stButton>button:hover { transform: scale(1.02); box-shadow: 0 0 15px rgba(255, 75, 75, 0.4); }
     </style>
     """, unsafe_allow_html=True)
 
 st.title("👑 THE CARD KING PRO")
-st.subheader("Análise Estatística de Arbitragem")
+st.markdown("<p style='color: #888;'>Painel de Inteligência em Arbitragem</p>", unsafe_allow_html=True)
 
-# Barra Lateral com Filtros
-st.sidebar.header("Configurações do Robô")
-site_fonte = st.sidebar.selectbox("Fonte de Dados", ["Transfermarkt", "FBRef", "BetMines (API)"])
-st.sidebar.write(f"🟢 Status: Conectado")
+# Dados (Ainda simulados, preparando para o Scraping)
+df = pd.DataFrame({
+    'Árbitro': ['R. Claus', 'W. Sampaio', 'A. Daronco', 'F. Rodrigues', 'B. Machado'],
+    'Média': [5.2, 6.1, 4.8, 5.5, 6.3],
+    'Tendência': ['Alta', 'Crítica', 'Média', 'Alta', 'Crítica']
+})
 
-# Dados para o Radar (Simulando o início do Scraping)
-data = {
-    'Árbitro': ['Raphael Claus', 'Wilton Sampaio', 'Anderson Daronco', 'Flavio Rodrigues', 'Bráulio Machado'],
-    'Jogos': [12, 15, 10, 14, 11],
-    'Média Amarelos': [5.2, 6.1, 4.8, 5.5, 6.3],
-    'Vermelhos': [3, 5, 1, 4, 6]
-}
-df_arbitros = pd.DataFrame(data)
-
-# Interface Principal
-col1, col2 = st.columns([1, 2])
+# Layout em colunas
+col1, col2 = st.columns([1, 1.5])
 
 with col1:
     st.markdown("### 🔍 Radar de Escala")
-    arbitro_selecionado = st.selectbox("Selecione o Árbitro", df_arbitros['Árbitro'])
+    selecao = st.selectbox("Selecione o Juiz", df['Árbitro'])
+    dado = df[df['Árbitro'] == selecao].iloc[0]
     
-    stats = df_arbitros[df_arbitros['Árbitro'] == arbitro_selecionado].iloc[0]
-    
-    st.metric("Média de Amarelos", stats['Média Amarelos'])
-    st.metric("Total de Vermelhos", int(stats['Vermelhos']))
+    # Card de Média Estilizado
+    st.markdown(f"""
+        <div class="metric-card">
+            <p style='color: #888; margin: 0;'>Média de Cartões</p>
+            <h1 style='color: #FF4B4B; margin: 0;'>{dado['Média']}</h1>
+            <p style='color: {"#FF4B4B" if dado['Tendência'] == "Crítica" else "#FFA500"};'>Tendência {dado['Tendência']}</p>
+        </div>
+    """, unsafe_allow_html=True)
 
 with col2:
-    st.markdown(f"### 📊 Comparativo de Médias")
-    st.bar_chart(df_arbitros.set_index('Árbitro')['Média Amarelos'])
+    st.markdown("### 📊 Performance nos Últimos Jogos")
+    # Gráfico Plotly (Estilo Profissional)
+    fig = px.bar(df, x='Árbitro', y='Média', color='Média', 
+                 color_continuous_scale=['#333', '#FF4B4B'],
+                 template='plotly_dark')
+    fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', showlegend=False)
+    st.plotly_chart(fig, use_container_width=True)
 
 st.divider()
 
-# Lógica de Alerta
-st.markdown("### ⚡ Veredito do King")
-if stats['Média Amarelos'] >= 5.5:
-    st.error(f"🔥 JOGO QUENTE: {arbitro_selecionado} tem média de {stats['Média Amarelos']}. Tendência Over Cartões.")
+# Veredito
+st.markdown("### 🚀 Veredito do King")
+if dado['Média'] > 5.5:
+    st.warning(f"O Juiz {selecao} é rigoroso. O mercado de **Over 4.5 Amarelos** tem valor aqui.")
 else:
-    st.info(f"⚖️ JOGO REGULAR: {arbitro_selecionado} tem média de {stats['Média Amarelos']}. Estudo para Live.")
+    st.info(f"O Juiz {selecao} costuma controlar bem o jogo. Evite mercados de cartões altos.")
 
-st.caption("Sistema Online - Engine v2.0")
+st.caption("Engine v2.5 - Design System v0-Alpha")
