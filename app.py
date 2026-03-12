@@ -1,117 +1,88 @@
 import streamlit as st
 import pandas as pd
-import plotly.graph_objects as go
 
-# 1. Configuração Master (Nome e Favicon)
-st.set_page_config(page_title="Rei dos Cartões", layout="wide", initial_sidebar_state="collapsed")
+# Configuração de Interface de Alta Conversão
+st.set_page_config(page_title="Rei dos Cartões - Scanner", layout="wide")
 
-# 2. CSS de Elite (Aparência v0 / Glassmorphism)
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-    html, body, [class*="st-"] { font-family: 'Inter', sans-serif; background-color: #050505; color: white; }
-    
-    .main-card {
-        background: linear-gradient(145deg, #111 0%, #000 100%);
-        border: 1px solid #333;
-        padding: 25px;
-        border-radius: 20px;
+    body { background-color: #000; color: #fff; }
+    .opportunity-card {
+        background: #111;
+        border-left: 5px solid #00FF41;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+    .odd-box {
+        background: #222;
+        padding: 10px;
+        border-radius: 5px;
         text-align: center;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        min-width: 80px;
     }
-    
-    .live-badge {
-        background-color: #FF4B4B;
-        color: white;
-        padding: 2px 10px;
-        border-radius: 50px;
-        font-size: 10px;
-        font-weight: bold;
-        animation: pulse 1.5s infinite;
-    }
-    
-    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-    
-    .probabilidade { font-size: 48px; font-weight: bold; color: #00FF41; margin: 10px 0; }
-    .label-mini { color: #888; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+    .profit-text { color: #00FF41; font-weight: bold; font-size: 20px; }
+    .house-text { color: #888; font-size: 12px; }
     </style>
     """, unsafe_allow_html=True)
 
-# 3. Cabeçalho
-st.markdown("### 👑 REI DOS CARTÕES <span style='color:#444'>| TERMINAL DE INTELIGÊNCIA</span>", unsafe_allow_html=True)
+st.title("🎯 SCANNER DE OPPORTUNIDADES")
+st.markdown("### Encontrando brechas nas Odds de Cartões")
 
-# 4. Inteligência de Dados (O Cérebro)
-DB_ARBITROS = {
-    "Raphael Claus": 6.2, "Wilton Sampaio": 5.8, "Anderson Daronco": 4.5, "Flavio Rodrigues": 5.5
-}
-
-# --- BARRA LATERAL (ENTRADA DE DADOS) ---
+# --- LÓGICA DE CÁLCULO DE VALOR ---
 with st.sidebar:
-    st.header("🎮 Controle do Jogo")
-    arbitro = st.selectbox("Árbitro:", list(DB_ARBITROS.keys()))
-    minuto = st.number_input("Minuto Atual:", value=25)
-    faltas = st.number_input("Faltas Totais:", value=15)
-    st.divider()
-    if st.button("📲 DISPARAR PRO TELEGRAM"):
-        st.success("Sinal enviado!")
+    st.header("⚙️ Ajuste de Mercado")
+    odd_casa = st.number_input("Odd Atual (Bet365/Betano):", value=2.20, step=0.05)
+    prob_real = st.slider("Probabilidade do Rei (%):", 0, 100, 65)
+    
+    # Cálculo: Odd Justa = 100 / Probabilidade
+    odd_justa = 100 / prob_real if prob_real > 0 else 0
+    # Valor = (Odd Casa / Odd Justa) - 1
+    valor = (odd_casa / odd_justa) - 1 if odd_justa > 0 else 0
 
-# --- CÁLCULO DE CRUZAMENTO ---
-media_juiz = DB_ARBITROS[arbitro]
-temp_live = faltas / minuto if minuto > 0 else 0
-# O Score Final cruza os dois dados (Lógica Lucrativa)
-score_final = int((media_juiz * 8) + (temp_live * 40))
-if score_final > 100: score_final = 100
-
-# --- INTERFACE VISUAL (O QUE VOCÊ GOSTOU) ---
-col1, col2 = st.columns([1.5, 1])
-
-with col1:
-    st.markdown(f"""
-        <div class="main-card">
-            <span class="live-badge">● LIVE ANALYTICS</span>
-            <p style='margin-top:20px;' class="label-mini">Probabilidade de Cartão</p>
-            <div class="probabilidade">{score_final}%</div>
-            <div style='display: flex; justify-content: space-around; margin-top:20px;'>
-                <div><p class="label-mini">Juiz</p><p>{arbitro} ({media_juiz})</p></div>
-                <div><p class="label-mini">Ritmo</p><p>{temp_live:.2f} faltas/min</p></div>
+# --- EXIBIÇÃO DA OPORTUNIDADE ---
+st.markdown(f"""
+    <div class="opportunity-card">
+        <div style='display: flex; justify-content: space-between; align-items: center;'>
+            <div>
+                <h2 style='margin:0;'>VASCO vs FLAMENGO</h2>
+                <p style='color:#888;'>Mercado: Over 5.5 Cartões</p>
+            </div>
+            <div style='text-align: right;'>
+                <span class="profit-text">{valor*100:.1f}% DE VALOR</span><br>
+                <small>VALOR ESPERADO POSITIVO (EV+)</small>
             </div>
         </div>
-    """, unsafe_allow_html=True)
-
-with col2:
-    st.markdown("#### 🌡️ PRESSÃO DE JOGO")
-    # Gráfico de Pressão
-    fig = go.Figure(go.Indicator(
-        mode = "gauge+number",
-        value = temp_live,
-        domain = {'x': [0, 1], 'y': [0, 1]},
-        title = {'text': "Faltas p/ Min", 'font': {'size': 14, 'color': "#888"}},
-        gauge = {
-            'axis': {'range': [None, 1.5], 'tickwidth': 1, 'tickcolor': "white"},
-            'bar': {'color': "#00FF41" if temp_live < 0.7 else "#FF4B4B"},
-            'bgcolor': "#111",
-            'borderwidth': 2,
-            'bordercolor': "#333",
-            'steps': [
-                {'range': [0, 0.6], 'color': '#111'},
-                {'range': [0.6, 1.5], 'color': '#220000'}],
-        }))
-    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', 
-                      font={'color': "white", 'family': "Inter"}, height=250, margin=dict(l=20, r=20, t=50, b=20))
-    st.plotly_chart(fig, use_container_width=True)
-
-st.divider()
-
-# --- TABELA DE MONITORAMENTO ---
-st.markdown("#### 📋 MONITOR DE SCANNER")
-st.markdown("""
-    <div style='background-color:#111; padding:15px; border-radius:10px; border:1px solid #222;'>
-        <div style='display:flex; justify-content:space-between; color:#888; font-size:12px;'>
-            <span>PARTIDA</span><span>STATUS</span><span>SCORE</span>
-        </div>
-        <hr style='border:0.5px solid #222;'>
-        <div style='display:flex; justify-content:space-between;'>
-            <span><b>Vasco x Flamengo</b></span><span style='color:#FF4B4B;'>🔥 QUENTE</span><span style='color:#00FF41;'>88%</span>
+        <hr style='border: 0.1px solid #333;'>
+        <div style='display: flex; gap: 20px; justify-content: center; margin-top:15px;'>
+            <div class="odd-box">
+                <span class="house-text">ODD CASA</span><br>
+                <span style='font-size: 24px; color: #FF4B4B;'>{odd_casa:.2f}</span>
+            </div>
+            <div style='font-size: 30px; align-self: center;'> VS </div>
+            <div class="odd-box">
+                <span class="house-text">ODD DO REI (JUSTA)</span><br>
+                <span style='font-size: 24px; color: #00FF41;'>{odd_justa:.2f}</span>
+            </div>
         </div>
     </div>
 """, unsafe_allow_html=True)
+
+# --- RECOMENDAÇÃO DE GESTÃO ---
+col1, col2 = st.columns(2)
+with col1:
+    st.info(f"**Análise do Rei:** A casa está subestimando este jogo em {valor*100:.0f}%. O histórico do árbitro e a temperatura live indicam que essa Odd deveria estar em {odd_justa:.2f}.")
+with col2:
+    st.warning(f"**Sugestão de Entrada:** {min(5.0, valor*20):.1f}% da sua banca (Gestão de Risco Moderada).")
+
+st.divider()
+
+# --- TABELA DE MONITORAMENTO DE ODDS ---
+st.markdown("#### 📡 Monitor de Radar - Outros Jogos")
+monitor_dados = {
+    "Jogo": ["Palmeiras x SPFC", "Cruzeiro x Galo"],
+    "Odd Casa": [1.85, 2.10],
+    "Odd Rei": [1.90, 1.75],
+    "Status": ["Aguardar Subir", "ENTRAR (VALOR)"]
+}
+st.table(pd.DataFrame(monitor_dados))
